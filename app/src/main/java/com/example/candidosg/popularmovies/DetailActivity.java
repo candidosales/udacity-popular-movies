@@ -14,7 +14,12 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.squareup.picasso.Picasso;
+
+import org.parceler.Parcels;
 
 public class DetailActivity extends AppCompatActivity {
 
@@ -73,10 +78,20 @@ public class DetailActivity extends AppCompatActivity {
             View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
 
             Intent intent = getActivity().getIntent();
-            if (intent != null && intent.hasExtra(Intent.EXTRA_TEXT)) {
-                movieStr = intent.getStringExtra(Intent.EXTRA_TEXT);
-                ((TextView) rootView.findViewById(R.id.detail_text))
-                        .setText(movieStr);
+//            Movie movie = Parcels.unwrap(intent.getParcelableExtra("movie"));
+            Movie movie = Parcels.unwrap(intent.getParcelableExtra("movie"));
+
+
+            if (intent != null && movie.getOriginalTitle() != "") {
+                ((TextView) rootView.findViewById(R.id.detail_movie_title))
+                        .setText(movie.getOriginalTitle());
+                ((TextView) rootView.findViewById(R.id.detail_movie_overview))
+                        .setText(movie.getOverview());
+
+                ImageView imageView = (ImageView) rootView.findViewById(R.id.detail_movie_image);
+                Picasso.with(getContext()).load(movie.getPosterUrlPath()).into(imageView);
+
+
             }
 
             return rootView;

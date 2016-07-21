@@ -3,6 +3,7 @@ package com.example.candidosg.popularmovies;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -12,14 +13,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.GridView;
-import android.widget.ListView;
-import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.parceler.Parcels;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -28,15 +27,16 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * Created by candidosg on 18/07/16.
  */
 public class MovieFragment extends Fragment {
 
-    ArrayAdapter<String> movieAdapter;
+    private MovieAdapter movieAdapter;
+    Movie[] movies = {
+            new Movie("0","0","0","0","0","0","0")
+    };
 
     public MovieFragment() {
 
@@ -73,7 +73,7 @@ public class MovieFragment extends Fragment {
     }
 
     private void updateMovies(String type) {
-        FetchMovieTask movieTask = new FetchMovieTask();
+        FetchMoviesTask movieTask = new FetchMoviesTask();
         movieTask.execute(type);
     }
 
@@ -85,35 +85,38 @@ public class MovieFragment extends Fragment {
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        movieAdapter =
-                new ArrayAdapter<String>(
-                        getActivity(),
-                        R.layout.list_item_movie,
-                        R.id.list_item_movie_textview,
-                        new ArrayList<String>());
-
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
-        GridView gridView = (GridView) rootView.findViewById(R.id.listview_movie);
+        movieAdapter = new MovieAdapter(getActivity(), new ArrayList<Movie>());
+
+        GridView gridView = (GridView) rootView.findViewById(R.id.gridview_movie);
         gridView.setAdapter(movieAdapter);
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-                String movie = movieAdapter.getItem(position);
-                Intent intent = new Intent(getActivity(), DetailActivity.class)
-                                .putExtra(Intent.EXTRA_TEXT, movie);
+                Movie movie = movieAdapter.getItem(position);
+                Log.v("TEST-MOVIE", "Movie entry: " + movie.getOriginalTitle() + " " + movie.getReleaseDate());
+
+                Intent intent = new Intent(getActivity(), DetailActivity.class);
+                intent.putExtra("movie", movie);
                 startActivity(intent);
+
+                Intent intent = DetailActivity.buildIntent(this, movie);
+
+//                Intent intent = new Intent(getActivity(), DetailActivity.class)
+//                                .putExtra("movie", movie.writeToParcel);
+//                startActivity(intent);
             }
         });
         return rootView;
     }
 
 
-    public class FetchMovieTask extends AsyncTask<String, Void, String[]> {
+    public class FetchMoviesTask extends AsyncTask<String, Void, Movie[]> {
 
-        private final String LOG_TAG = FetchMovieTask.class.getSimpleName();
+        private final String LOG_TAG = FetchMoviesTask.class.getSimpleName();
 
-        private String[] getMovieDataFromJson(String movieJsonStr) throws JSONException {
+        private Movie[] getMovieDataFromJson(String movieJsonStr) throws JSONException {
 
             // These are the names of the JSON objects that need to be extracted.
             final String RESULTS = "results";
@@ -128,29 +131,29 @@ public class MovieFragment extends Fragment {
             JSONObject movieJson = new JSONObject(movieJsonStr);
             JSONArray movieArray = movieJson.getJSONArray(RESULTS);
 
-            String[] resultStrs = new String[movieArray.length()];
+            Movie[] movies = new Movie[movieArray.length()];
 
             for(int i = 0; i < movieArray.length(); i++) {
 
                 JSONObject movieObject = movieArray.getJSONObject(i);
 
-                String id = movieObject.getString(ID);
-                String original_title = movieObject.getString(ORIGINAL_TITLE);
-                String original_language = movieObject.getString(ORIGINAL_LANGUAGE);
-                String poster_path = movieObject.getString(POSTER_PATH);
-                String backdrop_path = movieObject.getString(BACKDROP_PATH);
-
-                resultStrs[i] = id + " - " + original_title + " - " + original_language;
+                movies[i] = new Movie(movieObject.getString(ID),
+                        movieObject.getString(ID),
+                        movieObject.getString(ORIGINAL_LANGUAGE),
+                        movieObject.getString(POSTER_PATH),
+                        movieObject.getString(BACKDROP_PATH),
+                        movieObject.getString(OVERVIEW),
+                        movieObject.getString(RELEASE_DATE));
             }
 
-            for (String s : resultStrs) {
-                Log.v(LOG_TAG, "Movie entry: " + s);
+            for (Movie m : movies) {
+                Log.v(LOG_TAG, "Movie entry: " + m.getOriginalTitle());
             }
-            return resultStrs;
+            return movies;
         }
 
         @Override
-        protected String[] doInBackground(String... params) {
+        protected Movie[] doInBackground(String... params) {
 
             if (params.length == 0) {
                 return null;
@@ -218,11 +221,11 @@ public class MovieFragment extends Fragment {
             return null;
         }
 
-        protected void onPostExecute(String[] result) {
+        protected void onPostExecute(Movie[] result) {
             if (result != null) {
                 movieAdapter.clear();
-                for(String movieStr : result) {
-                    movieAdapter.add(movieStr);
+                for(Movie movie : result) {
+                    movieAdapter.add(movie);
                 }
             }
         }
