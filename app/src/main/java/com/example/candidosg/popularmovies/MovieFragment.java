@@ -1,5 +1,6 @@
 package com.example.candidosg.popularmovies;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -10,8 +11,11 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.GridView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -61,40 +65,46 @@ public class MovieFragment extends Fragment {
         }
 
         if (id != 0 && type != null) {
-            FetchMovieTask movieTask = new FetchMovieTask();
-            movieTask.execute(type);
+            updateMovies(type);
             return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
 
+    private void updateMovies(String type) {
+        FetchMovieTask movieTask = new FetchMovieTask();
+        movieTask.execute(type);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        updateMovies("popular");
+    }
+
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
-        String[] data = {
-                "Filme 1",
-                "Filme 2",
-                "Filme 3",
-                "Filme 4",
-                "Filme 5",
-                "Filme 6",
-                "Filme 7"
-        };
-
-        List<String> movies = new ArrayList<String>(Arrays.asList(data));
 
         movieAdapter =
                 new ArrayAdapter<String>(
                         getActivity(),
                         R.layout.list_item_movie,
                         R.id.list_item_movie_textview,
-                        movies);
+                        new ArrayList<String>());
 
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
-        ListView listView = (ListView) rootView.findViewById(R.id.listview_movie);
-        listView.setAdapter(movieAdapter);
+        GridView gridView = (GridView) rootView.findViewById(R.id.listview_movie);
+        gridView.setAdapter(movieAdapter);
+        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                String movie = movieAdapter.getItem(position);
+                Intent intent = new Intent(getActivity(), DetailActivity.class)
+                                .putExtra(Intent.EXTRA_TEXT, movie);
+                startActivity(intent);
+            }
+        });
         return rootView;
     }
 
