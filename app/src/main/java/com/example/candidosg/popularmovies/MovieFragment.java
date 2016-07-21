@@ -95,17 +95,10 @@ public class MovieFragment extends Fragment {
 
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
                 Movie movie = movieAdapter.getItem(position);
-                Log.v("TEST-MOVIE", "Movie entry: " + movie.getOriginalTitle() + " " + movie.getReleaseDate());
-
                 Intent intent = new Intent(getActivity(), DetailActivity.class);
-                intent.putExtra("movie", movie);
+                intent.putExtra("movie", Parcels.wrap(movie));
                 startActivity(intent);
 
-                Intent intent = DetailActivity.buildIntent(this, movie);
-
-//                Intent intent = new Intent(getActivity(), DetailActivity.class)
-//                                .putExtra("movie", movie.writeToParcel);
-//                startActivity(intent);
             }
         });
         return rootView;

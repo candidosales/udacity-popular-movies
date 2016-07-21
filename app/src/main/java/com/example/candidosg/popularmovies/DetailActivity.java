@@ -79,7 +79,9 @@ public class DetailActivity extends AppCompatActivity {
 
             Intent intent = getActivity().getIntent();
 //            Movie movie = Parcels.unwrap(intent.getParcelableExtra("movie"));
+//            Movie movie = Parcels.unwrap(intent.getParcelableExtra("movie"));
             Movie movie = Parcels.unwrap(intent.getParcelableExtra("movie"));
+            //intent.getExtras().getParcelable("movie");
 
 
             if (intent != null && movie.getOriginalTitle() != "") {

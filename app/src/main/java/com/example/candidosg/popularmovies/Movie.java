@@ -16,6 +16,9 @@ public class Movie {
     private String overview;
     private String releaseDate;
 
+    public Movie() {
+    }
+
     public Movie(String id, String originalTitle, String originalLanguage, String posterPath, String backdropPath, String overview, String releaseDate) {
         this.id = id;
         this.originalTitle = originalTitle;
