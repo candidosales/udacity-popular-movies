@@ -15,6 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RatingBar;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
@@ -89,6 +90,11 @@ public class DetailActivity extends AppCompatActivity {
                         .setText(movie.getOriginalTitle());
                 ((TextView) rootView.findViewById(R.id.detail_movie_overview))
                         .setText(movie.getOverview());
+                ((TextView) rootView.findViewById(R.id.detail_movie_release))
+                        .setText(movie.getReleaseDate());
+
+                ((RatingBar) rootView.findViewById(R.id.detail_movie_vote_average))
+                        .setRating(movie.getVoteAverage());
 
                 ImageView imageView = (ImageView) rootView.findViewById(R.id.detail_movie_image);
                 Picasso.with(getContext()).load(movie.getPosterUrlPath()).into(imageView);
@@ -128,5 +134,15 @@ public class DetailActivity extends AppCompatActivity {
                     movieStr + MOVIE_SHARE_HASHTAG);
             return shareIntent;
         }
+
+        public static class DetailVideosFragment extends Fragment {
+
+        }
+
+        public static class DetailReviewsFragment extends Fragment {
+
+        }
+
+
     }
 }

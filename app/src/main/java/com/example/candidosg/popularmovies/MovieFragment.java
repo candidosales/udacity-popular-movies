@@ -34,9 +34,6 @@ import java.util.ArrayList;
 public class MovieFragment extends Fragment {
 
     private MovieAdapter movieAdapter;
-    Movie[] movies = {
-            new Movie("0","0","0","0","0","0","0")
-    };
 
     public MovieFragment() {
 
@@ -120,6 +117,7 @@ public class MovieFragment extends Fragment {
             final String BACKDROP_PATH = "backdrop_path";
             final String OVERVIEW = "overview";
             final String RELEASE_DATE = "release_date";
+            final String VOTE_AVERAGE = "vote_average";
 
             JSONObject movieJson = new JSONObject(movieJsonStr);
             JSONArray movieArray = movieJson.getJSONArray(RESULTS);
@@ -131,12 +129,15 @@ public class MovieFragment extends Fragment {
                 JSONObject movieObject = movieArray.getJSONObject(i);
 
                 movies[i] = new Movie(movieObject.getString(ID),
-                        movieObject.getString(ID),
+                        movieObject.getString(ORIGINAL_TITLE),
                         movieObject.getString(ORIGINAL_LANGUAGE),
                         movieObject.getString(POSTER_PATH),
                         movieObject.getString(BACKDROP_PATH),
                         movieObject.getString(OVERVIEW),
-                        movieObject.getString(RELEASE_DATE));
+                        movieObject.getString(RELEASE_DATE),
+                        movieObject.getString(VOTE_AVERAGE),
+                        new ArrayList<MovieReview>(),
+                        new ArrayList<MovieVideo>());
             }
 
             for (Movie m : movies) {

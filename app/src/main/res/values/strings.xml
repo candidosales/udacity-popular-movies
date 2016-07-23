@@ -2,7 +2,7 @@
     <string name="app_name">PopularMovies</string>
     <string name="hello_world">Olá mundo!</string>
     <string name="action_order">Ordenar</string>
-    <string name="action_order_popular">Popular</string>
-    <string name="action_order_top_rated">Mais votado</string>
+    <string name="action_order_popular">Mais Popular</string>
+    <string name="action_order_top_rated">Melhor Avaliado</string>
     <string name="action_share">Compartilhar</string>
 </resources>
