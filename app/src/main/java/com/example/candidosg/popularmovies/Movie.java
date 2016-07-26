@@ -10,22 +10,20 @@ import java.util.List;
 @Parcel
 public class Movie {
 
-    private String id;
-    private String originalTitle;
-    private String originalLanguage;
-    private String posterPath;
-    private String backdropPath;
-    private String overview;
-    private String releaseDate;
-    private String voteAverage;
-    private List<MovieReview> movieReviewList;
-    private List<MovieVideo> movieVideoList;
+    String id;
+    String originalTitle;
+    String originalLanguage;
+    String posterPath;
+    String backdropPath;
+    String overview;
+    String releaseDate;
+    String voteAverage;
 
     public Movie() {
 
     }
 
-    public Movie(String id, String originalTitle, String originalLanguage, String posterPath, String backdropPath, String overview, String releaseDate, String voteAverage, List<MovieReview> movieReviewList, List<MovieVideo> movieVideoList) {
+    public Movie(String id, String originalTitle, String originalLanguage, String posterPath, String backdropPath, String overview, String releaseDate, String voteAverage) {
         this.id = id;
         this.originalTitle = originalTitle;
         this.originalLanguage = originalLanguage;
@@ -34,8 +32,6 @@ public class Movie {
         this.overview = overview;
         this.releaseDate = releaseDate;
         this.voteAverage = voteAverage;
-        this.movieReviewList = movieReviewList;
-        this.movieVideoList = movieVideoList;
 
     }
 
@@ -63,19 +59,4 @@ public class Movie {
         return "http://image.tmdb.org/t/p/w185/" + this.posterPath;
     }
 
-    public List<MovieReview> getMovieReviewList() {
-        return movieReviewList;
-    }
-
-    public void setMovieReviewList(List<MovieReview> movieReviewList) {
-        this.movieReviewList = movieReviewList;
-    }
-
-    public List<MovieVideo> getMovieVideoList() {
-        return movieVideoList;
-    }
-
-    public void setMovieVideoList(List<MovieVideo> movieVideoList) {
-        this.movieVideoList = movieVideoList;
-    }
 }

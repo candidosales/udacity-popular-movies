@@ -1,4 +1,4 @@
-package com.example.candidosg.popularmovies;
+package popularmovies2;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,6 +11,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
+
+import com.example.candidosg.popularmovies.DetailActivity;
+import com.example.candidosg.popularmovies.R;
 
 import org.parceler.Parcels;
 

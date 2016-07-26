@@ -1,7 +1,10 @@
-package com.example.candidosg.popularmovies;
+package popularmovies2;
 
 import android.os.AsyncTask;
 import android.util.Log;
+
+import com.example.candidosg.popularmovies.BuildConfig;
+import com.example.candidosg.popularmovies.Movie;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -14,7 +17,6 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -42,7 +44,7 @@ public abstract class MovieResources extends AsyncTask<Movie, Void, Movie> {
                         reviewObject.getString("url")));
             }
 
-            movie.setMovieReviewList(reviews);
+            //movie.setMovieReviewList(reviews);
         }
 
         if ( typeResource == "videos" ) {
@@ -59,7 +61,7 @@ public abstract class MovieResources extends AsyncTask<Movie, Void, Movie> {
                         videoObject.getString("type")));
             }
 
-            movie.setMovieVideoList(videos);
+            //movie.setMovieVideoList(videos);
         }
 
         return movie;
@@ -70,7 +72,7 @@ public abstract class MovieResources extends AsyncTask<Movie, Void, Movie> {
         if (movie == null) {
             return null;
         }
-        
+
         String[] typeResources = { "videos", "reviews" };
 
         HttpURLConnection urlConnection = null;

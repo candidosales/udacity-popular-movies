@@ -1,4 +1,4 @@
-package com.example.candidosg.popularmovies;
+package popularmovies2;
 
 /**
  * Created by candidosg on 23/07/16.

@@ -1,10 +1,13 @@
-package com.example.candidosg.popularmovies;
+package popularmovies2;
 
 import android.app.Activity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+
+import com.example.candidosg.popularmovies.MovieAdapter;
+import com.example.candidosg.popularmovies.R;
 
 import java.util.List;
 
@@ -32,6 +35,6 @@ public class MovieVideoAdapter extends ArrayAdapter<MovieVideo> {
         }
 
         return convertView;
-         uiiu
+
     }
 }

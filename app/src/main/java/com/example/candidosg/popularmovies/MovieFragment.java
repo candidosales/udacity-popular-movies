@@ -1,9 +1,11 @@
 package com.example.candidosg.popularmovies;
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -14,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -33,6 +36,8 @@ import java.util.ArrayList;
  */
 public class MovieFragment extends Fragment {
 
+    private final String LOG_TAG = MovieFragment.class.getSimpleName();
+
     private MovieAdapter movieAdapter;
 
     public MovieFragment() {
@@ -44,6 +49,7 @@ public class MovieFragment extends Fragment {
 
         setHasOptionsMenu(true);
     }
+
 
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.moviefragment, menu);
@@ -70,14 +76,33 @@ public class MovieFragment extends Fragment {
     }
 
     private void updateMovies(String type) {
-        FetchMoviesTask movieTask = new FetchMoviesTask();
-        movieTask.execute(type);
+        if (isOnline(getContext())) {
+            FetchMoviesTask movieTask = new FetchMoviesTask();
+            movieTask.execute(type);
+        }
+        else {
+            Log.d(LOG_TAG, "Wifi connected: false");
+            Toast.makeText(getContext(), "Você precisa está conectado a internet", Toast.LENGTH_LONG);
+        }
+    }
+
+    public boolean isOnline(Context context) {
+        ConnectivityManager cm =
+                (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = cm.getActiveNetworkInfo();
+        return netInfo != null && netInfo.isConnectedOrConnecting();
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        updateMovies("popular");
+        if (isOnline(getContext())) {
+            updateMovies("popular");
+        }
+        else {
+            Log.d(LOG_TAG, "Wifi connected: false");
+            Toast.makeText(getContext(), "Você precisa está conectado a internet", Toast.LENGTH_LONG);
+        }
     }
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -135,9 +160,7 @@ public class MovieFragment extends Fragment {
                         movieObject.getString(BACKDROP_PATH),
                         movieObject.getString(OVERVIEW),
                         movieObject.getString(RELEASE_DATE),
-                        movieObject.getString(VOTE_AVERAGE),
-                        new ArrayList<MovieReview>(),
-                        new ArrayList<MovieVideo>());
+                        movieObject.getString(VOTE_AVERAGE));
             }
 
             for (Movie m : movies) {
@@ -222,6 +245,18 @@ public class MovieFragment extends Fragment {
                     movieAdapter.add(movie);
                 }
             }
+        }
+
+        private boolean isNetworkAvailable(Context context) {
+            ConnectivityManager manager =
+                    (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo networkInfo = manager.getActiveNetworkInfo();
+            boolean isAvailable = false;
+            if (networkInfo != null && networkInfo.isConnected()) {
+                // Network is present and connected
+                isAvailable = true;
+            }
+            return isAvailable;
         }
     }
 }

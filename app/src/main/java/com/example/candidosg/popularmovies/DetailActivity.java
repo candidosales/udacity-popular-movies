@@ -2,7 +2,6 @@ package com.example.candidosg.popularmovies;
 
 import android.content.Intent;
 import android.support.v4.view.MenuItemCompat;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -51,10 +50,6 @@ public class DetailActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -66,7 +61,7 @@ public class DetailActivity extends AppCompatActivity {
         private static final String LOG_TAG = DetailFragment.class.getSimpleName();
 
         private static final String MOVIE_SHARE_HASHTAG = " #PopularMovie";
-        private String movieStr;
+        private Movie movie;
 
         public DetailFragment() {
             setHasOptionsMenu(true);
@@ -79,10 +74,8 @@ public class DetailActivity extends AppCompatActivity {
             View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
 
             Intent intent = getActivity().getIntent();
-//            Movie movie = Parcels.unwrap(intent.getParcelableExtra("movie"));
-//            Movie movie = Parcels.unwrap(intent.getParcelableExtra("movie"));
-            Movie movie = Parcels.unwrap(intent.getParcelableExtra("movie"));
-            //intent.getExtras().getParcelable("movie");
+            movie = Parcels.unwrap(intent.getParcelableExtra("movie"));
+
 
 
             if (intent != null && movie.getOriginalTitle() != "") {
@@ -131,16 +124,8 @@ public class DetailActivity extends AppCompatActivity {
             shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
             shareIntent.setType("text/plain");
             shareIntent.putExtra(Intent.EXTRA_TEXT,
-                    movieStr + MOVIE_SHARE_HASHTAG);
+                    movie.getOriginalTitle() + MOVIE_SHARE_HASHTAG);
             return shareIntent;
-        }
-
-        public static class DetailVideosFragment extends Fragment {
-
-        }
-
-        public static class DetailReviewsFragment extends Fragment {
-
         }
 
 
