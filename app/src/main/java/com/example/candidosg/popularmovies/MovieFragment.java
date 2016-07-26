@@ -82,7 +82,7 @@ public class MovieFragment extends Fragment {
         }
         else {
             Log.d(LOG_TAG, "Wifi connected: false");
-            Toast.makeText(getContext(), "Você precisa está conectado a internet", Toast.LENGTH_LONG);
+            Toast.makeText(getContext(), R.string.log_connection_fail, Toast.LENGTH_LONG).show();
         }
     }
 
@@ -101,7 +101,7 @@ public class MovieFragment extends Fragment {
         }
         else {
             Log.d(LOG_TAG, "Wifi connected: false");
-            Toast.makeText(getContext(), "Você precisa está conectado a internet", Toast.LENGTH_LONG);
+            Toast.makeText(getContext(), R.string.log_connection_fail, Toast.LENGTH_LONG).show();
         }
     }
 

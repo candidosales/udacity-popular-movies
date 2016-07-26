@@ -62,7 +62,8 @@
         android:rating="0"
         android:stepSize="1"
         android:layout_above="@+id/detail_movie_overview"
-        android:numStars="10"
-        android:theme="@style/RatingBar" />
+        android:numStars="5"
+        android:theme="@style/RatingBar"
+        style="android:attr/ratingBarStyleIndicator"/>
 
 </RelativeLayout>

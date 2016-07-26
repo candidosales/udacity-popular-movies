@@ -6,4 +6,5 @@
     <string name="action_order_popular">Mais Popular</string>
     <string name="action_order_top_rated">Melhor Avaliado</string>
     <string name="action_share">Compartilhar</string>
+    <string name="log_connection_fail">Você precisa está conectado a internet</string>
 </resources>
