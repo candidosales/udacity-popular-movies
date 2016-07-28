@@ -36,7 +36,7 @@ public class Movie {
     }
 
     public Float getVoteAverage() {
-        return Float.parseFloat(voteAverage);
+        return ( Float.parseFloat(voteAverage) * (float) 0.5 );
     }
 
     public String getId() {

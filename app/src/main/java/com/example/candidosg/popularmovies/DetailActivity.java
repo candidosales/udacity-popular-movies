@@ -89,6 +89,8 @@ public class DetailActivity extends AppCompatActivity {
                 ((RatingBar) rootView.findViewById(R.id.detail_movie_vote_average))
                         .setRating(movie.getVoteAverage());
 
+                Log.d("Vote", "" + movie.getVoteAverage());
+
                 ImageView imageView = (ImageView) rootView.findViewById(R.id.detail_movie_image);
                 Picasso.with(getContext()).load(movie.getPosterUrlPath()).into(imageView);
 

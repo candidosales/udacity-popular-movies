@@ -4,6 +4,4 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="linear_layout_grid_height">240dp</dimen>
     <dimen name="linear_layout_grid_width">180dp</dimen>
-    <dimen name="grid_item_movie_image_height">fill_parent</dimen>
-    <dimen name="grid_item_movie_image_width">fill_parent</dimen>
 </resources>

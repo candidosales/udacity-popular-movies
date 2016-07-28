@@ -54,16 +54,15 @@
         android:layout_alignStart="@+id/detail_movie_title" />
 
     <RatingBar
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style= "@style/CustomRatingBar"
         android:id="@+id/detail_movie_vote_average"
-        android:layout_below="@+id/detail_movie_release"
-        android:layout_toRightOf="@+id/detail_movie_image"
-        android:rating="0"
-        android:stepSize="1"
-        android:layout_above="@+id/detail_movie_overview"
         android:numStars="5"
-        android:theme="@style/RatingBar"
-        style="android:attr/ratingBarStyleIndicator"/>
+        android:stepSize="0.01"
+        android:isIndicator="true"
+        android:layout_below="@+id/detail_movie_title"
+        android:layout_alignRight="@+id/detail_movie_title"
+        android:layout_alignEnd="@+id/detail_movie_title" />
 
 </RelativeLayout>
