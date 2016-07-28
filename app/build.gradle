@@ -10,7 +10,7 @@ android {
         targetSdkVersion 24
         versionCode 1
         versionName "1.0"
-        buildConfigField "String", "OPEN_THE_MOVIE_DB_API_KEY", "\"0a93ea94c32aaa3a99b448852dbffccb\""
+        buildConfigField "String", "OPEN_THE_MOVIE_DB_API_KEY", "\"YOUR-KEY\""
 
     }
     buildTypes {
