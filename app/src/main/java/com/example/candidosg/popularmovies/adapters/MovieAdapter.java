@@ -1,30 +1,32 @@
-package popularmovies2;
+package com.example.candidosg.popularmovies.adapters;
 
 import android.app.Activity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 
-import com.example.candidosg.popularmovies.MovieAdapter;
 import com.example.candidosg.popularmovies.R;
+import com.example.candidosg.popularmovies.models.Movie;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
 /**
- * Created by candidosg on 23/07/16.
+ * Created by candidosg on 20/07/16.
  */
-public class MovieVideoAdapter extends ArrayAdapter<MovieVideo> {
+public class MovieAdapter extends ArrayAdapter<Movie> {
     private static final String LOG_TAG = MovieAdapter.class.getSimpleName();
 
-    public MovieVideoAdapter(Activity context, List<MovieVideo> movies) {
+    public MovieAdapter(Activity context, List<Movie> movies) {
         super(context, 0, movies);
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         // Gets the AndroidFlavor object from the ArrayAdapter at the appropriate position
-        MovieVideo movie = getItem(position);
+        Movie movie = getItem(position);
 
         // Adapters recycle views to AdapterViews.
         // If this is a new View object we're getting, then inflate the layout.
@@ -34,7 +36,13 @@ public class MovieVideoAdapter extends ArrayAdapter<MovieVideo> {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.grid_item_movie, parent, false);
         }
 
-        return convertView;
+        ImageView imageView = (ImageView) convertView.findViewById(R.id.grid_item_movie_image);
+        if (imageView == null) {
+            imageView = new ImageView(getContext());
+        }
 
+        Picasso.with(getContext()).load(movie.getPosterUrlPath()).into(imageView);
+
+        return convertView;
     }
 }

@@ -1,4 +1,4 @@
-package com.example.candidosg.popularmovies;
+package com.example.candidosg.popularmovies.models;
 
 import org.parceler.Parcel;
 
@@ -18,12 +18,14 @@ public class Movie {
     String overview;
     String releaseDate;
     String voteAverage;
+    List<MovieReview> movieReviewList;
+    List<MovieVideo> movieVideoList;
 
     public Movie() {
 
     }
 
-    public Movie(String id, String originalTitle, String originalLanguage, String posterPath, String backdropPath, String overview, String releaseDate, String voteAverage) {
+    public Movie(String id, String originalTitle, String originalLanguage, String posterPath, String backdropPath, String overview, String releaseDate, String voteAverage, List<MovieReview> movieReviewList, List<MovieVideo> movieVideoList) {
         this.id = id;
         this.originalTitle = originalTitle;
         this.originalLanguage = originalLanguage;
@@ -32,6 +34,8 @@ public class Movie {
         this.overview = overview;
         this.releaseDate = releaseDate;
         this.voteAverage = voteAverage;
+        this.movieReviewList = movieReviewList;
+        this.movieVideoList = movieVideoList;
 
     }
 
@@ -59,4 +63,19 @@ public class Movie {
         return "http://image.tmdb.org/t/p/w185/" + this.posterPath;
     }
 
+    public List<MovieReview> getMovieReviewList() {
+        return movieReviewList;
+    }
+
+    public void setMovieReviewList(List<MovieReview> movieReviewList) {
+        this.movieReviewList = movieReviewList;
+    }
+
+    public List<MovieVideo> getMovieVideoList() {
+        return movieVideoList;
+    }
+
+    public void setMovieVideoList(List<MovieVideo> movieVideoList) {
+        this.movieVideoList = movieVideoList;
+    }
 }

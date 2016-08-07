@@ -1,8 +1,11 @@
-package popularmovies2;
+package com.example.candidosg.popularmovies.models;
+
+import org.parceler.Parcel;
 
 /**
  * Created by candidosg on 23/07/16.
  */
+@Parcel
 public class MovieVideo {
     private String id;
     private String key;
@@ -10,6 +13,10 @@ public class MovieVideo {
     private String site;
     private String size;
     private String type;
+
+    public MovieVideo() {
+
+    }
 
     public MovieVideo(String id, String key, String name, String site, String size, String type) {
         this.id = id;
@@ -66,5 +73,17 @@ public class MovieVideo {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    @Override
+    public String toString() {
+        return "MovieVideo{" +
+                "id='" + id + '\'' +
+                ", key='" + key + '\'' +
+                ", name='" + name + '\'' +
+                ", site='" + site + '\'' +
+                ", size='" + size + '\'' +
+                ", type='" + type + '\'' +
+                '}';
     }
 }

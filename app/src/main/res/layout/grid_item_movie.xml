@@ -4,12 +4,12 @@ android:layout_width="@dimen/linear_layout_grid_width"
 android:layout_height="@dimen/linear_layout_grid_height"
 android:layout_margin="0dp"
 android:orientation="vertical"
-android:padding="0dp">
+android:paddingBottom="10dp">
 
 <ImageView
     android:id="@+id/grid_item_movie_image"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     android:scaleType="fitXY"/>
 
 </LinearLayout>

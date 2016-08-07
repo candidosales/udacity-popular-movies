@@ -1,8 +1,11 @@
-package popularmovies2;
+package com.example.candidosg.popularmovies.models;
+
+import org.parceler.Parcel;
 
 /**
  * Created by candidosg on 23/07/16.
  */
+@Parcel
 public class MovieReview {
     private String id;
     private String author;
@@ -10,15 +13,15 @@ public class MovieReview {
     private String url;
 
 
+    public MovieReview() {
+
+    }
+
     public MovieReview(String id, String author, String content, String url) {
         this.id = id;
         this.author = author;
         this.content = content;
         this.url = url;
-    }
-
-    public MovieReview() {
-
     }
 
     public String getId() {
@@ -51,5 +54,15 @@ public class MovieReview {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    @Override
+    public String toString() {
+        return "MovieReview{" +
+                "id='" + id + '\'' +
+                ", author='" + author + '\'' +
+                ", content='" + content + '\'' +
+                ", url='" + url + '\'' +
+                '}';
     }
 }

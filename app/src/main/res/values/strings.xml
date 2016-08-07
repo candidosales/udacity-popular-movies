@@ -1,10 +1,16 @@
 <resources>
-    <string name="app_name">Popular Movies</string>
+    <string name="app_name">Filmes Populares</string>
     <string name="title_activity_detail">Detalhes</string>
     <string name="hello_world">Olá mundo!</string>
     <string name="action_order">Ordenar</string>
     <string name="action_order_popular">Mais Popular</string>
     <string name="action_order_top_rated">Melhor Avaliado</string>
     <string name="action_share">Compartilhar</string>
+
     <string name="log_connection_fail">Você precisa está conectado a internet</string>
+
+
+    <string name="detail_movie_overview_example">Texto Medio Loremt Texto Medio Loremt Texto Medio Loremt Texto Medio Loremt Texto Medio LoremtTexto Medio Loremt Texto Medio Loremt Texto Medio Loremt </string>
+    <string name="header_movie_videos">Trailers</string>
+    <string name="header_movie_reviews">Reviews</string>
 </resources>

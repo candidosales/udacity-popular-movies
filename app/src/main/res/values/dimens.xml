@@ -4,4 +4,5 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="linear_layout_grid_height">240dp</dimen>
     <dimen name="linear_layout_grid_width">180dp</dimen>
+    <dimen name="text_margin">16dp</dimen>
 </resources>
