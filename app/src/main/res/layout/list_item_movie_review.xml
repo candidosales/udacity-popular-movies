@@ -8,9 +8,10 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="Comentário Comentário Comentário Comentário Comentário Comentário Comentário Comentário Comentário "
-        android:id="@+id/movie_review_content"/>
+        android:text="Small Text"
+        android:textSize="16sp"
+        android:id="@+id/movie_review_content"
+        android:textStyle="italic" />
 
     <TextView
         android:layout_width="match_parent"
@@ -18,7 +19,7 @@
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:text="Small Text"
         android:id="@+id/movie_review_author"
-        android:layout_marginBottom="4dp"/>
-
+        android:layout_marginBottom="4dp"
+        android:textStyle="bold" />
 
 </LinearLayout>
