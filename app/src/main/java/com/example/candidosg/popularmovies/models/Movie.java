@@ -10,7 +10,7 @@ import java.util.List;
 @Parcel
 public class Movie {
 
-    String id;
+    long id;
     String originalTitle;
     String originalLanguage;
     String posterPath;
@@ -25,7 +25,7 @@ public class Movie {
 
     }
 
-    public Movie(String id, String originalTitle, String originalLanguage, String posterPath, String backdropPath, String overview, String releaseDate, String voteAverage, List<MovieReview> movieReviewList, List<MovieVideo> movieVideoList) {
+    public Movie(long id, String originalTitle, String originalLanguage, String posterPath, String backdropPath, String overview, String releaseDate, String voteAverage, List<MovieReview> movieReviewList, List<MovieVideo> movieVideoList) {
         this.id = id;
         this.originalTitle = originalTitle;
         this.originalLanguage = originalLanguage;
@@ -43,7 +43,7 @@ public class Movie {
         return ( Float.parseFloat(voteAverage) * (float) 0.5 );
     }
 
-    public String getId() {
+    public long getId() {
         return id;
     }
 

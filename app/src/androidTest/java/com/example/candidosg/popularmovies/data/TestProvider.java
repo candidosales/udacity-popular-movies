@@ -8,6 +8,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.test.AndroidTestCase;
+import android.util.Log;
 
 import com.example.candidosg.popularmovies.data.MovieContract;
 import com.example.candidosg.popularmovies.data.MovieContract.MovieEntry;
@@ -45,7 +46,7 @@ public class TestProvider extends AndroidTestCase {
                 null,
                 null
         );
-        assertEquals("Error: Records not deleted from Weather table during delete", 0, cursor.getCount());
+        assertEquals("Error: Records not deleted from Movie table during delete", 0, cursor.getCount());
         cursor.close();
 
     }
@@ -97,6 +98,22 @@ public class TestProvider extends AndroidTestCase {
         }
     }
 
+//    public void testGetType() {
+//        // content://com.example.candidosg.popularmovies/movie/
+//        String type = mContext.getContentResolver().getType(MovieEntry.CONTENT_URI);
+//        // vnd.android.cursor.dir/com.example.candidosg.popularmovies/movie
+//        assertEquals("Error: the MovieEntry CONTENT_URI should return MovieEntry.CONTENT_TYPE",
+//                MovieEntry.CONTENT_TYPE, type);
+//
+//        long testMovie = 94074;
+//        // content://com.example.candidosg.popularmovies/movie/94074
+//        type = mContext.getContentResolver().getType(
+//                MovieEntry.buildMovieUri(testMovie));
+//        // vnd.android.cursor.dir/com.example.android.sunshine.app/weather
+//        assertEquals("Error: the MovieEntry CONTENT_URI with id should return MovieEntry.CONTENT_TYPE",
+//                MovieEntry.CONTENT_TYPE, type);
+//    }
+
     public void testBasicMovieQuery() {
         // insert our test records into the database
         MovieDbHelper dbHelper = new MovieDbHelper(mContext);
@@ -115,12 +132,62 @@ public class TestProvider extends AndroidTestCase {
                 null,
                 null,
                 null,
-                null,
                 null
         );
 
         // Make sure we get the correct cursor out of the database
         TestUtilities.validateCursor("testBasicMovieQuery", movieCursor, movieValues);
+    }
+
+    public void testUpdateMovie() {
+        // Create a new map of values, where column names are the keys
+        ContentValues values = TestUtilities.createMovieValues();
+
+        Uri movieUri = mContext.getContentResolver().insert(MovieEntry.CONTENT_URI, values);
+        long movieRowId = ContentUris.parseId(movieUri);
+
+        // Verify we got a row back.
+        assertTrue(movieRowId != -1);
+        Log.d(LOG_TAG, "New row id: " + movieRowId);
+
+        ContentValues updatedValues = new ContentValues(values);
+        updatedValues.put(MovieEntry._ID, movieRowId);
+        updatedValues.put(MovieEntry.COLUMN_ORIGINAL_TITLE, "Santa's Village");
+
+        // Create a cursor with observer to make sure that the content provider is notifying
+        // the observers as expected
+        Cursor movieCursor = mContext.getContentResolver().query(MovieEntry.CONTENT_URI, null, null, null, null);
+
+        TestUtilities.TestContentObserver tco = TestUtilities.getTestContentObserver();
+        movieCursor.registerContentObserver(tco);
+
+        int count = mContext.getContentResolver().update(
+                MovieEntry.CONTENT_URI, updatedValues, MovieEntry._ID + "= ?",
+                new String[] { Long.toString(movieRowId)});
+        assertEquals(count, 1);
+
+        // Test to make sure our observer is called.  If not, we throw an assertion.
+        //
+        // Students: If your code is failing here, it means that your content provider
+        // isn't calling getContext().getContentResolver().notifyChange(uri, null);
+        tco.waitForNotificationOrFail();
+
+        movieCursor.unregisterContentObserver(tco);
+        movieCursor.close();
+
+        // A cursor is your primary interface to the query results.
+        Cursor cursor = mContext.getContentResolver().query(
+                MovieEntry.CONTENT_URI,
+                null,   // projection
+                MovieEntry._ID + " = " + movieRowId,
+                null,   // Values for the "where" clause
+                null    // sort order
+        );
+
+        TestUtilities.validateCursor("testUpdateLocation.  Error validating location entry update.",
+                cursor, updatedValues);
+
+        cursor.close();
     }
 
     public void testInsertReadProvider() {
@@ -156,28 +223,26 @@ public class TestProvider extends AndroidTestCase {
         TestUtilities.validateCursor("testInsertReadProvider. Error validating LocationEntry.",
                 movieCursor, testValues);
 
+    }
 
 
-        // Get the joined Weather and Location data with a start date
-        movieCursor = mContext.getContentResolver().query(
-                MovieEntry.buildMovieUri(TestUtilities.TEST_MOVIE),
-                null, // leaving "columns" null just returns all the columns.
-                null, // cols for "where" clause
-                null, // values for "where" clause
-                null  // sort order
-        );
-        TestUtilities.validateCursor("testInsertReadProvider.  Error validating joined Weather and Location Data with start date.",
-                weatherCursor, weatherValues);
 
-//        // Get the joined Weather data for a specific date
-//        weatherCursor = mContext.getContentResolver().query(
-//                WeatherEntry.buildWeatherLocationWithDate(TestUtilities.TEST_LOCATION, TestUtilities.TEST_DATE),
-//                null,
-//                null,
-//                null,
-//                null
-//        );
-//        TestUtilities.validateCursor("testInsertReadProvider.  Error validating joined Weather and Location data for a specific date.",
-//                weatherCursor, weatherValues);
+
+
+    public void testDeleteRecords() {
+        testInsertReadProvider();
+
+        // Register a content observer for our location delete.
+        TestUtilities.TestContentObserver movieObserver = TestUtilities.getTestContentObserver();
+        mContext.getContentResolver().registerContentObserver(MovieEntry.CONTENT_URI, true, movieObserver);
+
+        deleteAllRecordsFromProvider();
+
+        // Students: If either of these fail, you most-likely are not calling the
+        // getContext().getContentResolver().notifyChange(uri, null); in the ContentProvider
+        // delete.  (only if the insertReadProvider is succeeding)
+        movieObserver.waitForNotificationOrFail();
+
+        mContext.getContentResolver().unregisterContentObserver(movieObserver);
     }
 }

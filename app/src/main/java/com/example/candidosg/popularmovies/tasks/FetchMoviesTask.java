@@ -61,7 +61,7 @@ public class FetchMoviesTask extends AsyncTask<String, Void, Movie[]> {
 
             JSONObject movieObject = movieArray.getJSONObject(i);
 
-            movies[i] = new Movie(movieObject.getString(ID),
+            movies[i] = new Movie(movieObject.getLong(ID),
                     movieObject.getString(ORIGINAL_TITLE),
                     movieObject.getString(ORIGINAL_LANGUAGE),
                     movieObject.getString(POSTER_PATH),

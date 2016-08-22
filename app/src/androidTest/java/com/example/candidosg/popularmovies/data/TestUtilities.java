@@ -20,7 +20,7 @@ import java.util.Set;
  */
 
 public class TestUtilities extends AndroidTestCase {
-    public static final String TEST_MOVIE = "1234";
+    public static final long TEST_MOVIE = 94074;
 
     public static void validateCursor(String error, Cursor valueCursor, ContentValues expectedValues) {
         assertTrue("Empty cursor returned. " + error, valueCursor.moveToFirst());
