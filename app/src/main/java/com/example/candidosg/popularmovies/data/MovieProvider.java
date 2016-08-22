@@ -18,29 +18,18 @@ public class MovieProvider extends ContentProvider {
     private MovieDbHelper mOpenHelper;
 
     static final int MOVIE = 100;
-    static final int WEATHER_WITH_LOCATION = 101;
-    static final int WEATHER_WITH_LOCATION_AND_DATE = 102;
+    static final int MOVIE_WITH_ID = 101;
 
     private static final SQLiteQueryBuilder sMovieQueryBuilder;
 
     static{
         sMovieQueryBuilder = new SQLiteQueryBuilder();
-
-        //This is an inner join which looks like
-        //weather INNER JOIN location ON weather.location_id = location._id
-//        sWeatherByLocationSettingQueryBuilder.setTables(
-//                MovieContract.MovieEntry.TABLE_NAME + " INNER JOIN " +
-//                        MovieContract.MovieEntry.TABLE_NAME +
-//                        " ON " + MovieContract.MovieEntry.TABLE_NAME +
-//                        "." + MovieContract.MovieEntry.COLUMN_LOC_KEY +
-//                        " = " + MovieContract.MovieEntry.TABLE_NAME +
-//                        "." + MovieContract.MovieEntry._ID);
     }
 
     //location.location_setting = ?
-//    private static final String sLocationSettingSelection =
-//            MovieContract.MovieEntry.TABLE_NAME+
-//                    "." + MovieContract.MovieEntry.COLUMN_LOCATION_SETTING + " = ? ";
+    private static final String sMovieSelection =
+            MovieContract.MovieEntry.TABLE_NAME+
+                    "." + MovieContract.MovieEntry.COLUMN_MOVIE_ID + " = ? ";
 
     //location.location_setting = ? AND date >= ?
 //    private static final String sLocationSettingWithStartDateSelection =
@@ -53,29 +42,23 @@ public class MovieProvider extends ContentProvider {
 //            MovieContract.MovieEntry.TABLE_NAME +
 //                    "." + MovieContract.MovieEntry.COLUMN_MOVIE_ID + " = ? ";
 //
-//    private Cursor getWeatherByLocationSetting(Uri uri, String[] projection, String sortOrder) {
-//        long startDate = MovieContract.MovieEntry.getStartDateFromUri(uri);
-//
-//        String[] selectionArgs;
-//        String selection;
-//
-//        if (startDate == 0) {
-//            selection = sLocationSettingSelection;
-//            selectionArgs = new String[]{locationSetting};
-//        } else {
-//            selectionArgs = new String[]{locationSetting, Long.toString(startDate)};
-//            selection = sLocationSettingWithStartDateSelection;
-//        }
-//
-//        return sWeatherByLocationSettingQueryBuilder.query(mOpenHelper.getReadableDatabase(),
-//                projection,
-//                selection,
-//                selectionArgs,
-//                null,
-//                null,
-//                sortOrder
-//        );
-//    }
+    private Cursor getMovie(Uri uri, String[] projection, String sortOrder) {
+        String[] selectionArgs;
+        String selection;
+
+
+        selectionArgs = new String[]{};
+        selection = sMovieSelection;
+
+        return sMovieQueryBuilder.query(mOpenHelper.getReadableDatabase(),
+                projection,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                sortOrder
+        );
+    }
 
 //    private Cursor getWeatherByLocationSettingAndDate(
 //            Uri uri, String[] projection, String sortOrder) {
@@ -108,7 +91,15 @@ public class MovieProvider extends ContentProvider {
 
 
         // 3) Return the new matcher!
-        return null;
+
+        final UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
+        final String authority = MovieContract.CONTENT_AUTHORITY;
+
+        // For each type of URI you want to add, create a corresponding code.
+        matcher.addURI(authority, MovieContract.PATH_MOVIE, MOVIE);
+        matcher.addURI(authority, MovieContract.PATH_MOVIE + "/*", MOVIE_WITH_ID);
+
+        return matcher;
     }
 
     /*
@@ -132,9 +123,6 @@ public class MovieProvider extends ContentProvider {
         final int match = sUriMatcher.match(uri);
 
         switch (match) {
-            // Student: Uncomment and fill out these two cases
-//            case WEATHER_WITH_LOCATION_AND_DATE:
-//            case WEATHER_WITH_LOCATION:
             case MOVIE:
                 return MovieContract.MovieEntry.CONTENT_TYPE;
             default:
@@ -143,8 +131,7 @@ public class MovieProvider extends ContentProvider {
     }
 
     @Override
-    public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs,
-                        String sortOrder) {
+    public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
         // Here's the switch statement that, given a URI, will determine what kind of request it is,
         // and query the database accordingly.
         Cursor retCursor;
@@ -155,14 +142,22 @@ public class MovieProvider extends ContentProvider {
 //                retCursor = getWeatherByLocationSettingAndDate(uri, projection, sortOrder);
 //                break;
 //            }
-//            // "weather/*"
+            // "weather/*"
 //            case WEATHER_WITH_LOCATION: {
 //                retCursor = getWeatherByLocationSetting(uri, projection, sortOrder);
 //                break;
 //            }
             // "weather"
             case MOVIE: {
-                retCursor = null;
+                retCursor = mOpenHelper.getReadableDatabase().query(
+                        MovieContract.MovieEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder
+                );
                 break;
             }
 

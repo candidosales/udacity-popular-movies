@@ -8,9 +8,6 @@ import android.test.AndroidTestCase;
  */
 public class TestUriMatcher extends AndroidTestCase {
     private static final String MOVIE_QUERY = "123123";
-    private static final long TEST_DATE = 1419033600L;  // December 20th, 2014
-    private static final long TEST_LOCATION_ID = 10L;
-
     // content://com.example.android.sunshine.app/weather"
     private static final Uri TEST_MOVIE_DIR = MovieContract.MovieEntry.CONTENT_URI;
     /*
