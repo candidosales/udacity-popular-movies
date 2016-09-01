@@ -1,13 +1,18 @@
 package com.example.candidosg.popularmovies.tasks;
 
+import android.content.ContentUris;
+import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
 
 import com.example.candidosg.popularmovies.BuildConfig;
 import com.example.candidosg.popularmovies.adapters.MovieAdapter;
+import com.example.candidosg.popularmovies.data.MovieContract;
 import com.example.candidosg.popularmovies.models.Movie;
 import com.example.candidosg.popularmovies.models.MovieReview;
 import com.example.candidosg.popularmovies.models.MovieVideo;
@@ -23,6 +28,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Vector;
 
 /**
  * Created by candidosg on 06/08/16.
@@ -57,6 +63,8 @@ public class FetchMoviesTask extends AsyncTask<String, Void, Movie[]> {
 
         Movie[] movies = new Movie[movieArray.length()];
 
+        Vector<ContentValues> cVVector = new Vector<ContentValues>(movieArray.length());
+
         for(int i = 0; i < movieArray.length(); i++) {
 
             JSONObject movieObject = movieArray.getJSONObject(i);
@@ -71,6 +79,30 @@ public class FetchMoviesTask extends AsyncTask<String, Void, Movie[]> {
                     movieObject.getString(VOTE_AVERAGE),
                     new ArrayList<MovieReview>(),
                     new ArrayList<MovieVideo>());
+
+
+
+            // Database
+            ContentValues movieValues = new ContentValues();
+
+            // Then add the data, along with the corresponding name of the data type,
+            // so the content provider knows what kind of value is being inserted.
+            movieValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_ID, movieObject.getLong(ID));
+            movieValues.put(MovieContract.MovieEntry.COLUMN_ORIGINAL_TITLE, movieObject.getString(ORIGINAL_TITLE));
+            movieValues.put(MovieContract.MovieEntry.COLUMN_ORIGINAL_LANGUAGE, movieObject.getString(ORIGINAL_LANGUAGE));
+            movieValues.put(MovieContract.MovieEntry.COLUMN_POSTER_PATH, movieObject.getString(POSTER_PATH));
+            movieValues.put(MovieContract.MovieEntry.COLUMN_OVERVIEW, movieObject.getString(OVERVIEW));
+            movieValues.put(MovieContract.MovieEntry.COLUMN_RELEASE_DATE, movieObject.getString(RELEASE_DATE));
+            movieValues.put(MovieContract.MovieEntry.COLUMN_VOTE_AVERAGE, movieObject.getString(VOTE_AVERAGE));
+
+            cVVector.add(movieValues);
+        }
+
+        // Database
+        if ( cVVector.size() > 0 ) {
+            ContentValues[] cvArray = new ContentValues[cVVector.size()];
+            cVVector.toArray(cvArray);
+            mContext.getContentResolver().bulkInsert(MovieContract.MovieEntry.CONTENT_URI, cvArray);
         }
 
         for (Movie m : movies) {
@@ -167,5 +199,49 @@ public class FetchMoviesTask extends AsyncTask<String, Void, Movie[]> {
             isAvailable = true;
         }
         return isAvailable;
+    }
+
+    public long addMovie(String movieId, String originalTitle, String originalLanguage, String posterPath, String overview, String releaseDate, String voteAverage) {
+        long id;
+
+        // First, check if the location with this city name exists in the db
+        Cursor movieCursor = mContext.getContentResolver().query(
+                MovieContract.MovieEntry.CONTENT_URI,
+                new String[]{MovieContract.MovieEntry.COLUMN_MOVIE_ID},
+                MovieContract.MovieEntry.COLUMN_MOVIE_ID + " = ?",
+                new String[]{movieId},
+                null);
+
+        if (movieCursor.moveToFirst()) {
+            int movieIdIndex = movieCursor.getColumnIndex(MovieContract.MovieEntry._ID);
+            id = movieCursor.getLong(movieIdIndex);
+        } else {
+            // Now that the content provider is set up, inserting rows of data is pretty simple.
+            // First create a ContentValues object to hold the data you want to insert.
+            ContentValues movieValues = new ContentValues();
+
+            // Then add the data, along with the corresponding name of the data type,
+            // so the content provider knows what kind of value is being inserted.
+            movieValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_ID, movieId);
+            movieValues.put(MovieContract.MovieEntry.COLUMN_ORIGINAL_TITLE, originalTitle);
+            movieValues.put(MovieContract.MovieEntry.COLUMN_ORIGINAL_LANGUAGE, originalLanguage);
+            movieValues.put(MovieContract.MovieEntry.COLUMN_POSTER_PATH, posterPath);
+            movieValues.put(MovieContract.MovieEntry.COLUMN_OVERVIEW, overview);
+            movieValues.put(MovieContract.MovieEntry.COLUMN_RELEASE_DATE, releaseDate);
+            movieValues.put(MovieContract.MovieEntry.COLUMN_VOTE_AVERAGE, voteAverage);
+
+            // Finally, insert location data into the database.
+            Uri insertedUri = mContext.getContentResolver().insert(
+                    MovieContract.MovieEntry.CONTENT_URI,
+                    movieValues
+            );
+
+            // The resulting URI contains the ID for the row.  Extract the locationId from the Uri.
+            id = ContentUris.parseId(insertedUri);
+        }
+
+        movieCursor.close();
+        // Wait, that worked?  Yes!
+        return id;
     }
 }
