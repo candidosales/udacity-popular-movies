@@ -11,16 +11,15 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
-/**
- * Created by candidosg on 04/09/16.
- */
+import com.example.candidosg.popularmovies.data.MovieContract;
+
 public class MovieProvider extends ContentProvider {
     public static final String LOG_TAG = MovieProvider.class.getSimpleName();
 
     public static final int MOVIE = 100;
     public static final int MOVIE_WITH_POSTER = 101;
     public static final int MOVIE_WITH_ID = 102;
-
+//
 //    public static final int TRAILER = 200;
 //    public static final int TRAILER_WITH_MOVIE_ID = 201;
 //

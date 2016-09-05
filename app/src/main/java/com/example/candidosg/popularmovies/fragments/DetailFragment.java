@@ -2,10 +2,14 @@ package com.example.candidosg.popularmovies.fragments;
 
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.ShareActionProvider;
 import android.util.Log;
@@ -22,6 +26,7 @@ import android.widget.TextView;
 
 import com.example.candidosg.popularmovies.BuildConfig;
 import com.example.candidosg.popularmovies.R;
+import com.example.candidosg.popularmovies.data.MovieContract;
 import com.example.candidosg.popularmovies.models.Movie;
 import com.example.candidosg.popularmovies.models.MovieReview;
 import com.example.candidosg.popularmovies.models.MovieVideo;
@@ -44,61 +49,157 @@ import java.util.List;
 /**
  * Created by candidosg on 06/08/16.
  */
-public class DetailFragment extends Fragment {
+public class DetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final String LOG_TAG = DetailFragment.class.getSimpleName();
 
     private static final String MOVIE_SHARE_HASHTAG = " #PopularMovie";
     private Movie movie;
 
+    private static final int DETAIL_LOADER = 0;
+    private static final String[] MOVIE_COLUMNS = {
+            // In this case the id needs to be fully qualified with a table name, since
+            // the content provider joins the location & weather tables in the background
+            // (both have an _id column)
+            // On the one hand, that's annoying.  On the other, you can search the weather table
+            // using the location set by the user, which is only in the Location table.
+            // So the convenience is worth it.
+            MovieContract.MovieEntry.TABLE_NAME + "." + MovieContract.MovieEntry._ID,
+            MovieContract.MovieEntry.COLUMN_ORIGINAL_TITLE,
+            MovieContract.MovieEntry.COLUMN_ORIGINAL_LANGUAGE,
+            MovieContract.MovieEntry.COLUMN_POSTER_PATH,
+            MovieContract.MovieEntry.COLUMN_BACKDROP_PATH,
+            MovieContract.MovieEntry.COLUMN_OVERVIEW,
+            MovieContract.MovieEntry.COLUMN_RELEASE_DATE,
+            MovieContract.MovieEntry.COLUMN_VOTE_AVERAGE,
+            MovieContract.MovieEntry.COLUMN_POPULARITY
+    };
+
+    // These indices are tied to FORECAST_COLUMNS.  If FORECAST_COLUMNS changes, these
+    // must change.
+    static final int COL_MOVIE_ID = 0;
+    static final int COL_MOVIE_ORIGINAL_TITLE = 1;
+    static final int COL_MOVIE_ORIGINAL_LANGUAGE = 2;
+    static final int COL_MOVIE_POSTER_PATH = 3;
+    static final int COL_MOVIE_BACKDROP_PATH = 4;
+    static final int COL_MOVIE_OVERVIEW = 5;
+    static final int COL_MOVIE_RELEASE_DATE = 6;
+    static final int COL_MOVIE_VOTE_AVERAGE = 7;
+    static final int COL_MOVIE_POPULARITY = 8;
+
     public DetailFragment() {
         setHasOptionsMenu(true);
     }
 
-    @Override
-    public void onCreate(Bundle savedInstanceState){
-        super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
-
-        Intent intent = getActivity().getIntent();
-        movie = Parcels.unwrap(intent.getParcelableExtra("Movie"));
-
-        if (intent != null){
-            FetchMovieVideosTask movieVideosTask = new FetchMovieVideosTask(movie);
-            movieVideosTask.execute("videos");
-
-            FetchMovieReviewsTask movieReviewsTask = new FetchMovieReviewsTask(movie);
-            movieReviewsTask.execute("reviews");
-        }
-
-    }
+//    @Override
+//    public void onCreate(Bundle savedInstanceState){
+//        super.onCreate(savedInstanceState);
+//        setHasOptionsMenu(true);
+//
+//        Intent intent = getActivity().getIntent();
+//        movie = Parcels.unwrap(intent.getParcelableExtra("Movie"));
+//
+//        if (intent != null){
+////            FetchMovieVideosTask movieVideosTask = new FetchMovieVideosTask(movie);
+////            movieVideosTask.execute("videos");
+////
+////            FetchMovieReviewsTask movieReviewsTask = new FetchMovieReviewsTask(movie);
+////            movieReviewsTask.execute("reviews");
+//        }
+//
+//    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
+        return inflater.inflate(R.layout.fragment_detail, container, false);
 
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        inflater.inflate(R.menu.detailfragment, menu);
+
+        // Retrieve the share menu item
+        MenuItem menuItem = menu.findItem(R.id.action_share);
+
+        // Get the provider and hold onto it to set/change the share intent.
+        ShareActionProvider mShareActionProvider =
+                (ShareActionProvider) MenuItemCompat.getActionProvider(menuItem);
+
+        // Attach an intent to this ShareActionProvider.  You can update this at any time,
+        // like when the user selects a new piece of data they might like to share.
+        if (mShareActionProvider != null ) {
+            mShareActionProvider.setShareIntent(createShareMovieIntent());
+        } else {
+            Log.d(LOG_TAG, "Share Action Provider is null?");
+        }
+    }
+
+    private Intent createShareMovieIntent() {
+        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+        shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+        shareIntent.setType("text/plain");
+        shareIntent.putExtra(Intent.EXTRA_TEXT,
+                movie.getOriginalTitle() + MOVIE_SHARE_HASHTAG);
+        return shareIntent;
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        getLoaderManager().initLoader(DETAIL_LOADER, null, this);
+        super.onActivityCreated(savedInstanceState);
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        Log.v(LOG_TAG, "In onCreateLoader");
         Intent intent = getActivity().getIntent();
-        movie = Parcels.unwrap(intent.getParcelableExtra("Movie"));
-
-        if (intent != null && movie.getOriginalTitle() != "") {
-            ((TextView) rootView.findViewById(R.id.detail_movie_title))
-                    .setText(movie.getOriginalTitle());
-            ((TextView) rootView.findViewById(R.id.detail_movie_overview))
-                    .setText(movie.getOverview());
-            ((TextView) rootView.findViewById(R.id.detail_movie_release))
-                    .setText(movie.getReleaseDate());
-
-            ((RatingBar) rootView.findViewById(R.id.detail_movie_vote_average))
-                    .setRating(movie.getVoteAverage());
-
-            ImageView imageView = (ImageView) rootView.findViewById(R.id.detail_movie_image);
-            Picasso.with(getContext()).load(movie.getPosterUrlPath()).into(imageView);
+        if (intent == null) {
+            return null;
         }
 
-        return rootView;
+        // Now create and return a CursorLoader that will take care of
+        // creating a Cursor for the data being displayed.
+        return new CursorLoader(
+                getActivity(),
+                intent.getData(),
+                MOVIE_COLUMNS,
+                null,
+                null,
+                null
+        );
     }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        Log.v(LOG_TAG, "In onLoadFinished");
+        if (!data.moveToFirst()) { return; }
+
+            ((TextView) getView().findViewById(R.id.detail_movie_title))
+                    .setText(data.getString(COL_MOVIE_ORIGINAL_TITLE));
+            ((TextView) getView().findViewById(R.id.detail_movie_overview))
+                    .setText(data.getString(COL_MOVIE_OVERVIEW));
+            ((TextView) getView().findViewById(R.id.detail_movie_release))
+                    .setText(data.getString(COL_MOVIE_RELEASE_DATE));
+
+            ((RatingBar) getView().findViewById(R.id.detail_movie_vote_average))
+                    .setRating(data.getFloat(COL_MOVIE_VOTE_AVERAGE));
+
+            ImageView imageView = (ImageView) getView().findViewById(R.id.detail_movie_image);
+            Picasso.with(getContext()).load(data.getString(COL_MOVIE_POSTER_PATH)).into(imageView);
+
+//
+//        // If onCreateOptionsMenu has already happened, we need to update the share intent now.
+//        if (mShareActionProvider != null) {
+//            mShareActionProvider.setShareIntent(createShareForecastIntent());
+//        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) { }
 
     public void addMovieVideosViews(List<MovieVideo> movieVideos) {
         final LayoutInflater inflater = LayoutInflater.from(getActivity());
@@ -148,35 +249,9 @@ public class DetailFragment extends Fragment {
         }
     }
 
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        inflater.inflate(R.menu.detailfragment, menu);
 
-        // Retrieve the share menu item
-        MenuItem menuItem = menu.findItem(R.id.action_share);
 
-        // Get the provider and hold onto it to set/change the share intent.
-        ShareActionProvider mShareActionProvider =
-                (ShareActionProvider) MenuItemCompat.getActionProvider(menuItem);
 
-        // Attach an intent to this ShareActionProvider.  You can update this at any time,
-        // like when the user selects a new piece of data they might like to share.
-        if (mShareActionProvider != null ) {
-            mShareActionProvider.setShareIntent(createShareMovieIntent());
-        } else {
-            Log.d(LOG_TAG, "Share Action Provider is null?");
-        }
-    }
-
-    private Intent createShareMovieIntent() {
-        Intent shareIntent = new Intent(Intent.ACTION_SEND);
-        shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
-        shareIntent.setType("text/plain");
-        shareIntent.putExtra(Intent.EXTRA_TEXT,
-                movie.getOriginalTitle() + MOVIE_SHARE_HASHTAG);
-        return shareIntent;
-    }
 
     private void openYouTubeIntent(String key) {
         Intent youTubeIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.youtube.com/watch?v=" + key));

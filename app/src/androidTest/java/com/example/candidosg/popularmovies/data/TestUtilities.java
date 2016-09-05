@@ -20,16 +20,15 @@ import java.util.Set;
  */
 
 public class TestUtilities extends AndroidTestCase {
-    static final String TEST_LOCATION = "99705";
-    static final long TEST_DATE = 1419033600L;  // December 20th, 2014
+    public static final long TEST_MOVIE = 94074;
 
-    static void validateCursor(String error, Cursor valueCursor, ContentValues expectedValues) {
+    public static void validateCursor(String error, Cursor valueCursor, ContentValues expectedValues) {
         assertTrue("Empty cursor returned. " + error, valueCursor.moveToFirst());
         validateCurrentRecord(error, valueCursor, expectedValues);
         valueCursor.close();
     }
 
-    static void validateCurrentRecord(String error, Cursor valueCursor, ContentValues expectedValues) {
+    public static void validateCurrentRecord(String error, Cursor valueCursor, ContentValues expectedValues) {
         Set<Map.Entry<String, Object>> valueSet = expectedValues.valueSet();
         for (Map.Entry<String, Object> entry : valueSet) {
             String columnName = entry.getKey();
@@ -45,9 +44,9 @@ public class TestUtilities extends AndroidTestCase {
     /*
         Students: Use this to create some default weather values for your database tests.
      */
-    static ContentValues createMovieValues() {
+    public static ContentValues createMovieValues() {
         ContentValues movieValues = new ContentValues();
-        movieValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_ID, "123");
+        movieValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_ID, TEST_MOVIE);
         movieValues.put(MovieContract.MovieEntry.COLUMN_ORIGINAL_LANGUAGE, "Portuguese");
         movieValues.put(MovieContract.MovieEntry.COLUMN_ORIGINAL_TITLE, "Batman");
         movieValues.put(MovieContract.MovieEntry.COLUMN_OVERVIEW, "Morcego");
@@ -58,26 +57,6 @@ public class TestUtilities extends AndroidTestCase {
         return movieValues;
     }
 
-
-    /*
-        Students: You can uncomment this function once you have finished creating the
-        LocationEntry part of the WeatherContract as well as the WeatherDbHelper.
-     */
-    static long insertNorthPoleLocationValues(Context context) {
-        // insert our test records into the database
-        MovieDbHelper dbHelper = new MovieDbHelper(context);
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-        ContentValues testValues = TestUtilities.createMovieValues();
-
-        long locationRowId;
-        locationRowId = db.insert(MovieContract.MovieEntry.TABLE_NAME, null, testValues);
-
-        // Verify we got a row back.
-        assertTrue("Error: Failure to insert North Pole Location Values", locationRowId != -1);
-
-        return locationRowId;
-    }
-
     /*
         Students: The functions we provide inside of TestProvider use this utility class to test
         the ContentObserver callbacks using the PollingCheck class that we grabbed from the Android
@@ -85,7 +64,7 @@ public class TestUtilities extends AndroidTestCase {
         Note that this only tests that the onChange function is called; it does not test that the
         correct Uri is returned.
      */
-    static class TestContentObserver extends ContentObserver {
+    public static class TestContentObserver extends ContentObserver {
         final HandlerThread mHT;
         boolean mContentChanged;
 
@@ -126,7 +105,7 @@ public class TestUtilities extends AndroidTestCase {
         }
     }
 
-    static TestContentObserver getTestContentObserver() {
+    public static TestContentObserver getTestContentObserver() {
         return TestContentObserver.getTestContentObserver();
     }
 }

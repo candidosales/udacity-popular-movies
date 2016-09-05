@@ -11,7 +11,7 @@ import com.example.candidosg.popularmovies.data.MovieContract.MovieEntry;
  */
 public class MovieDbHelper  extends SQLiteOpenHelper{
 
-    public static final int DATABATE_VERSION = 1;
+    public static final int DATABATE_VERSION = 5;
     static final String DATABASE_NAME = "movie.db";
 
     public MovieDbHelper(Context context) {
@@ -27,10 +27,12 @@ public class MovieDbHelper  extends SQLiteOpenHelper{
                 MovieEntry.COLUMN_ORIGINAL_TITLE + " TEXT NOT NULL," +
                 MovieEntry.COLUMN_OVERVIEW + " TEXT NOT NULL," +
                 MovieEntry.COLUMN_POSTER_PATH + " TEXT NOT NULL," +
+                MovieEntry.COLUMN_BACKDROP_PATH + " TEXT NULL," +
                 MovieEntry.COLUMN_RELEASE_DATE + " TEXT NOT NULL," +
-                MovieContract.MovieEntry.COLUMN_POPULARITY + " REAL NOT NULL, " +
-                MovieContract.MovieEntry.COLUMN_FAVORITE + " INTEGER DEFAULT 0, " +
-                MovieEntry.COLUMN_VOTE_AVERAGE + " TEXT NOT NULL) ;";
+                MovieEntry.COLUMN_POPULARITY + " REAL NOT NULL, " +
+                MovieEntry.COLUMN_FAVORITE + " INTEGER DEFAULT 0, " +
+                MovieEntry.COLUMN_VOTE_AVERAGE + " TEXT NOT NULL, "
+                + " UNIQUE (" + MovieEntry.COLUMN_MOVIE_ID + ") ON CONFLICT REPLACE);";
 
         sqLiteDatabase.execSQL(SQL_CREATE_MOVIE_TABLE);
 

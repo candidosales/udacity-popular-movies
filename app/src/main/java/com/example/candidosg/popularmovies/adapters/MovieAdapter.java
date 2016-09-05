@@ -2,7 +2,6 @@ package com.example.candidosg.popularmovies.adapters;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,7 +12,6 @@ import android.widget.ImageView;
 import com.example.candidosg.popularmovies.Config;
 import com.example.candidosg.popularmovies.R;
 import com.example.candidosg.popularmovies.data.MovieContract;
-import com.example.candidosg.popularmovies.models.Movie;
 import com.squareup.picasso.Picasso;
 
 /**
