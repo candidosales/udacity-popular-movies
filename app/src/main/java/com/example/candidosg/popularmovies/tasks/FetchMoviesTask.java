@@ -8,6 +8,7 @@ import android.util.Log;
 
 import com.example.candidosg.popularmovies.BuildConfig;
 import com.example.candidosg.popularmovies.adapters.MovieAdapter;
+import com.example.candidosg.popularmovies.adapters.MovieArrayAdapter;
 import com.example.candidosg.popularmovies.models.Movie;
 import com.example.candidosg.popularmovies.models.MovieReview;
 import com.example.candidosg.popularmovies.models.MovieVideo;
@@ -34,9 +35,9 @@ public class FetchMoviesTask extends AsyncTask<String, Void, Movie[]> {
     private MovieAdapter mMovieAdapter;
     private final Context mContext;
 
-    public FetchMoviesTask(Context context, MovieAdapter movieAdapter) {
+    public FetchMoviesTask(Context context, MovieAdapter mMovieAdapter) {
         mContext = context;
-        mMovieAdapter = movieAdapter;
+        mMovieAdapter = mMovieAdapter;
     }
 
     private Movie[] getMovieDataFromJson(String movieJsonStr) throws JSONException {

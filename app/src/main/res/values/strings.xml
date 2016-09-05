@@ -13,4 +13,9 @@
     <string name="detail_movie_overview_example">Texto Medio Loremt Texto Medio Loremt Texto Medio Loremt Texto Medio Loremt Texto Medio LoremtTexto Medio Loremt Texto Medio Loremt Texto Medio Loremt </string>
     <string name="header_movie_videos">Trailers</string>
     <string name="header_movie_reviews">Reviews</string>
+
+    <string name="api_image_medium">w342</string>
+
+    <string name="prefs_sort_key">sorting_type</string>
+    <string name="prefs_sort_default_value">popularity</string>
 </resources>

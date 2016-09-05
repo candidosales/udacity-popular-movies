@@ -1,48 +1,50 @@
 package com.example.candidosg.popularmovies.adapters;
 
-import android.app.Activity;
+import android.content.Context;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
+import android.widget.CursorAdapter;
 import android.widget.ImageView;
 
+import com.example.candidosg.popularmovies.Config;
 import com.example.candidosg.popularmovies.R;
+import com.example.candidosg.popularmovies.data.MovieContract;
 import com.example.candidosg.popularmovies.models.Movie;
 import com.squareup.picasso.Picasso;
 
-import java.util.List;
-
 /**
- * Created by candidosg on 20/07/16.
+ * Created by candidosg on 04/09/16.
  */
-public class MovieAdapter extends ArrayAdapter<Movie> {
-    private static final String LOG_TAG = MovieAdapter.class.getSimpleName();
+public class MovieAdapter extends CursorAdapter {
 
-    public MovieAdapter(Activity context, List<Movie> movies) {
-        super(context, 0, movies);
+    public MovieAdapter(Context context, Cursor c, int flags) {
+        super(context, c, flags);
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        // Gets the AndroidFlavor object from the ArrayAdapter at the appropriate position
-        Movie movie = getItem(position);
+    public View newView(Context context, Cursor cursor, ViewGroup parent) {
+        View view = LayoutInflater.from(context).inflate(R.layout.grid_item_movie, parent, false);
 
-        // Adapters recycle views to AdapterViews.
-        // If this is a new View object we're getting, then inflate the layout.
-        // If not, this view already has the layout inflated from a previous call to getView,
-        // and we modify the View widgets as usual.
-        if (convertView == null) {
-            convertView = LayoutInflater.from(getContext()).inflate(R.layout.grid_item_movie, parent, false);
-        }
+        return view;
+    }
 
-        ImageView imageView = (ImageView) convertView.findViewById(R.id.grid_item_movie_image);
-        if (imageView == null) {
-            imageView = new ImageView(getContext());
-        }
+    @Override
+    public void bindView(View view, Context context, Cursor cursor) {
 
-        Picasso.with(getContext()).load(movie.getPosterUrlPath()).into(imageView);
+        ImageView imageView = (ImageView) view.findViewById(R.id.grid_item_movie_image);
 
-        return convertView;
+        int moviePosterColumn = cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_POSTER_PATH);
+        String moviePoster = cursor.getString(moviePosterColumn);
+
+        Uri imageUri = Uri.parse(Config.IMAGE_BASE_URL).buildUpon()
+                .appendPath(context.getString(R.string.api_image_medium))
+                .appendPath(moviePoster.substring(1))
+                .build();
+
+        Picasso.with(context).load(imageUri).into(imageView);
     }
 }
