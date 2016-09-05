@@ -100,11 +100,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 //        movie = Parcels.unwrap(intent.getParcelableExtra("Movie"));
 //
 //        if (intent != null){
-////            FetchMovieVideosTask movieVideosTask = new FetchMovieVideosTask(movie);
-////            movieVideosTask.execute("videos");
-////
-////            FetchMovieReviewsTask movieReviewsTask = new FetchMovieReviewsTask(movie);
-////            movieReviewsTask.execute("reviews");
+
 //        }
 //
 //    }
@@ -132,20 +128,20 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         // Attach an intent to this ShareActionProvider.  You can update this at any time,
         // like when the user selects a new piece of data they might like to share.
         if (mShareActionProvider != null ) {
-            mShareActionProvider.setShareIntent(createShareMovieIntent());
+            //mShareActionProvider.setShareIntent(createShareMovieIntent());
         } else {
             Log.d(LOG_TAG, "Share Action Provider is null?");
         }
     }
 
-    private Intent createShareMovieIntent() {
-        Intent shareIntent = new Intent(Intent.ACTION_SEND);
-        shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
-        shareIntent.setType("text/plain");
-        shareIntent.putExtra(Intent.EXTRA_TEXT,
-                movie.getOriginalTitle() + MOVIE_SHARE_HASHTAG);
-        return shareIntent;
-    }
+//    private Intent createShareMovieIntent() {
+//        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+//        shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+//        shareIntent.setType("text/plain");
+//        shareIntent.putExtra(Intent.EXTRA_TEXT,
+//                movie.getOriginalTitle() + MOVIE_SHARE_HASHTAG);
+//        return shareIntent;
+//    }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
@@ -190,6 +186,16 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
             ImageView imageView = (ImageView) getView().findViewById(R.id.detail_movie_image);
             Picasso.with(getContext()).load(data.getString(COL_MOVIE_POSTER_PATH)).into(imageView);
+
+
+            Movie movie = new Movie();
+            movie.setId(data.getLong(COL_MOVIE_ID));
+
+            FetchMovieVideosTask movieVideosTask = new FetchMovieVideosTask(movie);
+            movieVideosTask.execute("videos");
+
+            FetchMovieReviewsTask movieReviewsTask = new FetchMovieReviewsTask(movie);
+            movieReviewsTask.execute("reviews");
 
 //
 //        // If onCreateOptionsMenu has already happened, we need to update the share intent now.
