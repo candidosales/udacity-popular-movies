@@ -1,10 +1,7 @@
 package com.example.candidosg.popularmovies.fragments;
 
-import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -20,19 +17,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
-import android.widget.Toast;
 
+import com.example.candidosg.popularmovies.Config;
 import com.example.candidosg.popularmovies.DetailActivity;
+import com.example.candidosg.popularmovies.R;
+import com.example.candidosg.popularmovies.SettingsActivity;
 import com.example.candidosg.popularmovies.Utility;
 import com.example.candidosg.popularmovies.adapters.MovieAdapter;
 import com.example.candidosg.popularmovies.data.MovieContract;
-import com.example.candidosg.popularmovies.tasks.FetchMoviesTask;
-import com.example.candidosg.popularmovies.R;
-import com.example.candidosg.popularmovies.adapters.MovieArrayAdapter;
-import com.example.candidosg.popularmovies.models.Movie;
-
-import org.parceler.Parcels;
-import java.util.ArrayList;
 
 /**
  * Created by candidosg on 18/07/16.
@@ -91,23 +83,30 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
 
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        String type = null;
 
         if (id == R.id.action_order_popular) {
-            type = "popular";
+            Utility.putPrefSelected(getActivity(), Config.PREF_MOST_POPULAR);
         }
 
         if (id == R.id.action_order_top_rated) {
-            type = "top_rated";
+            Utility.putPrefSelected(getActivity(), Config.PREF_HIGH_RATED);
         }
 
-        if (id != 0 && type != null) {
-            updateMovies(type);
+        if (id == R.id.action_order_favorite) {
+            Utility.putPrefSelected(getActivity(), Config.PREF_FAVORITE);
+        }
+
+        if (id == R.id.action_settings) {
+            startActivity(new Intent(getContext(), SettingsActivity.class));
             return true;
         }
 
+        onPreferenceChanged();
+
         return super.onOptionsItemSelected(item);
     }
+
+
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
@@ -133,25 +132,6 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
             }
         });
 
-
-//        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//
-//            @Override
-//            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-//                // CursorAdapter returns a cursor at the correct position for getItem(), or null
-//                // if it cannot seek to that position.
-//                Cursor cursor = (Cursor) adapterView.getItemAtPosition(position);
-//                if (cursor != null) {
-//                    String locationSetting = Utility.getPreferredLocation(getActivity());
-//                    Intent intent = new Intent(getActivity(), DetailActivity.class)
-//                            .setData(WeatherContract.WeatherEntry.buildWeatherLocationWithDate(
-//                                    locationSetting, cursor.getLong(COL_WEATHER_DATE)
-//                            ));
-//                    startActivity(intent);
-//                }
-//            }
-//        });
-
         return rootView;
     }
 
@@ -161,36 +141,8 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
         super.onActivityCreated(savedInstanceState);
     }
 
-
-
-    private void updateMovies(String type) {
-        if (isOnline(getContext())) {
-            FetchMoviesTask movieTask = new FetchMoviesTask(getActivity());
-            movieTask.execute(type);
-        }
-        else {
-            Log.d(LOG_TAG, "Wifi connected: false");
-            Toast.makeText(getContext(), R.string.log_connection_fail, Toast.LENGTH_LONG).show();
-        }
-    }
-
-    public boolean isOnline(Context context) {
-        ConnectivityManager cm =
-                (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo netInfo = cm.getActiveNetworkInfo();
-        return netInfo != null && netInfo.isConnectedOrConnecting();
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        if (isOnline(getContext())) {
-            updateMovies("popular");
-        }
-        else {
-            Log.d(LOG_TAG, "Wifi connected: false");
-            Toast.makeText(getContext(), R.string.log_connection_fail, Toast.LENGTH_LONG).show();
-        }
+    public void onPreferenceChanged(){
+        getLoaderManager().restartLoader(MOVIE_LOADER, null, this);
     }
 
 
@@ -198,20 +150,34 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         String sortOrderSetting = Utility.getPreferredSortOrder(getActivity());
+
+        Log.d(LOG_TAG, "sortOrderSetting " + sortOrderSetting);
+
         String sortOrder;
+        String selection = null;
         final int NUMBER_OF_MOVIES = 20;
 
-        if (sortOrderSetting.equals(getString(R.string.prefs_sort_default_value))) {
-            sortOrder = MovieContract.MovieEntry.COLUMN_POPULARITY + " DESC";
-        } else {
-            //sort by rating
-            sortOrder = MovieContract.MovieEntry.COLUMN_VOTE_AVERAGE + " DESC";
+        switch (sortOrderSetting){
+            case Config.PREF_HIGH_RATED:
+                sortOrder = MovieContract.MovieEntry.COLUMN_VOTE_AVERAGE + " DESC";
+                break;
+            case Config.PREF_FAVORITE:
+                selection = MovieContract.MovieEntry.TABLE_NAME + "." + MovieContract.MovieEntry.COLUMN_FAVORITE + " = 1 ";
+            case Config.PREF_MOST_POPULAR:
+                sortOrder = MovieContract.MovieEntry.COLUMN_RELEASE_DATE + " DESC";
+                break;
+            default:
+                sortOrder = null;
+
         }
+
+        Log.d(LOG_TAG, "sortOrder " + sortOrder);
+
 
         return new CursorLoader(getActivity(),
                 MovieContract.MovieEntry.CONTENT_URI,
                 MOVIE_COLUMNS,
-                null,
+                selection,
                 null,
                 sortOrder + " LIMIT " + NUMBER_OF_MOVIES);
     }

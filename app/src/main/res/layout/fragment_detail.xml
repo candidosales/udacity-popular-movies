@@ -61,7 +61,7 @@
         android:layout_height="90dp"
         android:id="@+id/scrollViewOverview"
         android:layout_below="@+id/detail_movie_image"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="40dp"
         android:fillViewport="true">
         <TextView
             android:layout_width="wrap_content"
@@ -130,5 +130,19 @@
             android:orientation="vertical">
         </LinearLayout>
     </ScrollView>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Favorito"
+        android:textColor="#ffffff"
+        android:id="@+id/buttonFavorite"
+        android:layout_below="@+id/detail_movie_release"
+        android:layout_alignLeft="@+id/detail_movie_release"
+        android:layout_alignStart="@+id/detail_movie_release"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:onClick="toggleFavorite"
+        android:layout_marginTop="10dp" />
 
 </RelativeLayout>

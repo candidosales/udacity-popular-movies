@@ -3,6 +3,7 @@ package com.example.candidosg.popularmovies.adapters;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +19,7 @@ import com.squareup.picasso.Picasso;
  * Created by candidosg on 04/09/16.
  */
 public class MovieAdapter extends CursorAdapter {
+    private static final String LOG_TAG = MovieAdapter.class.getSimpleName();
 
     public MovieAdapter(Context context, Cursor c, int flags) {
         super(context, c, flags);

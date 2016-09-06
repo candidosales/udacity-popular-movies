@@ -1,5 +1,6 @@
 package com.example.candidosg.popularmovies.fragments;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -19,12 +20,14 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
 import com.example.candidosg.popularmovies.BuildConfig;
+import com.example.candidosg.popularmovies.Config;
 import com.example.candidosg.popularmovies.R;
 import com.example.candidosg.popularmovies.data.MovieContract;
 import com.example.candidosg.popularmovies.models.Movie;
@@ -56,6 +59,9 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     private static final String MOVIE_SHARE_HASHTAG = " #PopularMovie";
     private Movie movie;
 
+    private int IS_FAVORITE = 0;
+    private int MOVIE_ID;
+
     private static final int DETAIL_LOADER = 0;
     private static final String[] MOVIE_COLUMNS = {
             // In this case the id needs to be fully qualified with a table name, since
@@ -65,6 +71,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             // using the location set by the user, which is only in the Location table.
             // So the convenience is worth it.
             MovieContract.MovieEntry.TABLE_NAME + "." + MovieContract.MovieEntry._ID,
+            MovieContract.MovieEntry.COLUMN_MOVIE_ID,
             MovieContract.MovieEntry.COLUMN_ORIGINAL_TITLE,
             MovieContract.MovieEntry.COLUMN_ORIGINAL_LANGUAGE,
             MovieContract.MovieEntry.COLUMN_POSTER_PATH,
@@ -72,38 +79,27 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             MovieContract.MovieEntry.COLUMN_OVERVIEW,
             MovieContract.MovieEntry.COLUMN_RELEASE_DATE,
             MovieContract.MovieEntry.COLUMN_VOTE_AVERAGE,
-            MovieContract.MovieEntry.COLUMN_POPULARITY
+            MovieContract.MovieEntry.COLUMN_POPULARITY,
+            MovieContract.MovieEntry.COLUMN_FAVORITE
     };
 
     // These indices are tied to FORECAST_COLUMNS.  If FORECAST_COLUMNS changes, these
     // must change.
-    static final int COL_MOVIE_ID = 0;
-    static final int COL_MOVIE_ORIGINAL_TITLE = 1;
-    static final int COL_MOVIE_ORIGINAL_LANGUAGE = 2;
-    static final int COL_MOVIE_POSTER_PATH = 3;
-    static final int COL_MOVIE_BACKDROP_PATH = 4;
-    static final int COL_MOVIE_OVERVIEW = 5;
-    static final int COL_MOVIE_RELEASE_DATE = 6;
-    static final int COL_MOVIE_VOTE_AVERAGE = 7;
-    static final int COL_MOVIE_POPULARITY = 8;
+    static final int COL_ID = 0;
+    static final int COL_MOVIE_ID = 1;
+    static final int COL_MOVIE_ORIGINAL_TITLE = 2;
+    static final int COL_MOVIE_ORIGINAL_LANGUAGE = 3;
+    static final int COL_MOVIE_POSTER_PATH = 4;
+    static final int COL_MOVIE_BACKDROP_PATH = 5;
+    static final int COL_MOVIE_OVERVIEW = 6;
+    static final int COL_MOVIE_RELEASE_DATE = 7;
+    static final int COL_MOVIE_VOTE_AVERAGE = 8;
+    static final int COL_MOVIE_POPULARITY = 9;
+    static final int COL_MOVIE_FAVORITE = 10;
 
     public DetailFragment() {
         setHasOptionsMenu(true);
     }
-
-//    @Override
-//    public void onCreate(Bundle savedInstanceState){
-//        super.onCreate(savedInstanceState);
-//        setHasOptionsMenu(true);
-//
-//        Intent intent = getActivity().getIntent();
-//        movie = Parcels.unwrap(intent.getParcelableExtra("Movie"));
-//
-//        if (intent != null){
-
-//        }
-//
-//    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -174,28 +170,100 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         Log.v(LOG_TAG, "In onLoadFinished");
         if (!data.moveToFirst()) { return; }
 
-            ((TextView) getView().findViewById(R.id.detail_movie_title))
-                    .setText(data.getString(COL_MOVIE_ORIGINAL_TITLE));
-            ((TextView) getView().findViewById(R.id.detail_movie_overview))
-                    .setText(data.getString(COL_MOVIE_OVERVIEW));
-            ((TextView) getView().findViewById(R.id.detail_movie_release))
-                    .setText(data.getString(COL_MOVIE_RELEASE_DATE));
+        ((TextView) getView().findViewById(R.id.detail_movie_title))
+                .setText(data.getString(COL_MOVIE_ORIGINAL_TITLE));
+        ((TextView) getView().findViewById(R.id.detail_movie_overview))
+                .setText(data.getString(COL_MOVIE_OVERVIEW));
+        ((TextView) getView().findViewById(R.id.detail_movie_release))
+                .setText(data.getString(COL_MOVIE_RELEASE_DATE));
 
-            ((RatingBar) getView().findViewById(R.id.detail_movie_vote_average))
-                    .setRating(data.getFloat(COL_MOVIE_VOTE_AVERAGE));
+        ((RatingBar) getView().findViewById(R.id.detail_movie_vote_average))
+                .setRating(data.getFloat(COL_MOVIE_VOTE_AVERAGE));
 
-            ImageView imageView = (ImageView) getView().findViewById(R.id.detail_movie_image);
-            Picasso.with(getContext()).load(data.getString(COL_MOVIE_POSTER_PATH)).into(imageView);
+        ImageView imageView = (ImageView) getView().findViewById(R.id.detail_movie_image);
+
+        Uri imageUri = Uri.parse(Config.IMAGE_BASE_URL).buildUpon()
+            .appendPath(getContext().getString(R.string.api_image_medium))
+            .appendPath(data.getString(COL_MOVIE_POSTER_PATH).replace("/", ""))
+            .build();
 
 
-            Movie movie = new Movie();
-            movie.setId(data.getLong(COL_MOVIE_ID));
+        Picasso.with(getContext()).load(imageUri).into(imageView);
 
-            FetchMovieVideosTask movieVideosTask = new FetchMovieVideosTask(movie);
-            movieVideosTask.execute("videos");
+        Button buttonFavorite = (Button) getView().findViewById(R.id.buttonFavorite);
 
-            FetchMovieReviewsTask movieReviewsTask = new FetchMovieReviewsTask(movie);
-            movieReviewsTask.execute("reviews");
+        MOVIE_ID = data.getInt(COL_MOVIE_ID);
+
+        IS_FAVORITE = data.getInt(COL_MOVIE_FAVORITE);
+
+        Log.d(LOG_TAG,"MOVIE_ID " + MOVIE_ID + " IS_FAVORITE " + IS_FAVORITE);
+
+        if (IS_FAVORITE == 1) {
+            buttonFavorite.setText(getActivity().getString(R.string.button_favorite_remove));
+            buttonFavorite.setBackgroundColor(getResources().getColor(R.color.colorAccent));
+        } else {
+            buttonFavorite.setText(getActivity().getString(R.string.button_favorite_add));
+            buttonFavorite.setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
+        }
+
+        buttonFavorite.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                switch (IS_FAVORITE) {
+                    case 0: {
+                        ContentValues addFavorite = new ContentValues();
+                        addFavorite.put(MovieContract.MovieEntry.COLUMN_FAVORITE, 1); //mark as favorite
+
+                        int updatedRows = getActivity().getContentResolver().update(
+                                MovieContract.MovieEntry.CONTENT_URI,
+                                addFavorite,
+                                MovieContract.MovieEntry.COLUMN_MOVIE_ID + " = ?",
+                                new String[]{String.valueOf(MOVIE_ID)}
+                        );
+
+                        if (updatedRows <= 0) {
+                            Log.d(LOG_TAG, "Movie not marked as favorite");
+                        } else {
+                            Log.d(LOG_TAG, "Movie marked as favorite");
+                        }
+                    }
+                    break;
+
+                    case 1: {
+                        ContentValues removeFavorite = new ContentValues();
+                        removeFavorite.put(MovieContract.MovieEntry.COLUMN_FAVORITE, 0); //unmark as favorite
+
+                        int updatedRows = getActivity().getContentResolver().update(
+                                MovieContract.MovieEntry.CONTENT_URI,
+                                removeFavorite,
+                                MovieContract.MovieEntry.COLUMN_MOVIE_ID + " = ?",
+                                new String[]{String.valueOf(MOVIE_ID)}
+                        );
+
+                        if (updatedRows < 0) {
+                            Log.d(LOG_TAG, "Movie not unmarked as favorite");
+                        } else {
+                            Log.d(LOG_TAG, "Movie unmarked as favorite");
+                        }
+                    }
+                    break;
+
+                    default:
+                        Log.e(LOG_TAG, "What is this?!");
+
+                }
+            }
+        });
+
+
+        Movie movie = new Movie();
+        movie.setId(data.getLong(COL_MOVIE_ID));
+
+        FetchMovieVideosTask movieVideosTask = new FetchMovieVideosTask(movie);
+        movieVideosTask.execute("videos");
+
+        FetchMovieReviewsTask movieReviewsTask = new FetchMovieReviewsTask(movie);
+        movieReviewsTask.execute("reviews");
 
 //
 //        // If onCreateOptionsMenu has already happened, we need to update the share intent now.
@@ -204,17 +272,18 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 //        }
     }
 
+
     @Override
     public void onLoaderReset(Loader<Cursor> loader) { }
 
     public void addMovieVideosViews(List<MovieVideo> movieVideos) {
-        final LayoutInflater inflater = LayoutInflater.from(getActivity());
+        final LayoutInflater inflaterVideos = LayoutInflater.from(getActivity());
 
         if (movieVideos != null && !movieVideos.isEmpty()) {
             LinearLayout mMovieVideoLinearLayout = (LinearLayout) getActivity().findViewById(R.id.movie_detail_video_container);
             for (MovieVideo movieVideo : movieVideos) {
 
-                final View movieVideoView = inflater.inflate(R.layout.list_item_movie_video, mMovieVideoLinearLayout, false);
+                final View movieVideoView = inflaterVideos.inflate(R.layout.list_item_movie_video, mMovieVideoLinearLayout, false);
 
                 final String videoKey =  movieVideo.getKey();
 
@@ -256,11 +325,8 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     }
 
 
-
-
-
     private void openYouTubeIntent(String key) {
-        Intent youTubeIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.youtube.com/watch?v=" + key));
+        Intent youTubeIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(Config.YOUTUBE_TRAILER_URL + key));
         youTubeIntent.putExtra("force_fullscreen", true);
         startActivity(youTubeIntent);
     }
@@ -317,7 +383,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
             try {
 
-                String baseUrl = "https://api.themoviedb.org/3/movie/" + mMovie.getId() + "/" + typeResource;
+                String baseUrl = Config.API_BASE_URL + "/movie/" + mMovie.getId() + "/" + typeResource;
                 String apiKey = "?api_key=" + BuildConfig.OPEN_THE_MOVIE_DB_API_KEY;
                 URL url = new URL(baseUrl.concat(apiKey));
 

@@ -6,6 +6,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.example.candidosg.popularmovies.BuildConfig;
+import com.example.candidosg.popularmovies.Config;
 import com.example.candidosg.popularmovies.data.MovieContract;
 
 import org.json.JSONArray;
@@ -52,7 +53,7 @@ public class FetchMoviesTask extends AsyncTask<String, Void, Void> {
             JSONArray movieArray = movieJson.getJSONArray(RESULTS);
 
 
-            Vector<ContentValues> cVVector = new Vector<ContentValues>(movieArray.length());
+            Vector<ContentValues> cVVector = new Vector<>(movieArray.length());
 
             for(int i = 0; i < movieArray.length(); i++) {
 
@@ -105,7 +106,7 @@ public class FetchMoviesTask extends AsyncTask<String, Void, Void> {
 
         try {
 
-            String baseUrl = "https://api.themoviedb.org/3/movie/" + params[0];
+            String baseUrl = Config.API_BASE_URL + "/movie/" + params[0];
             String apiKey = "?api_key=" + BuildConfig.OPEN_THE_MOVIE_DB_API_KEY;
             URL url = new URL(baseUrl.concat(apiKey));
 
