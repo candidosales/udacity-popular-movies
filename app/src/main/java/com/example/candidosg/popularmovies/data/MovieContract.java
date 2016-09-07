@@ -37,9 +37,7 @@ public class MovieContract {
         public static final String COLUMN_OVERVIEW = "overview";
         public static final String COLUMN_RELEASE_DATE = "release_date";
         public static final String COLUMN_VOTE_AVERAGE = "vote_average";
-
         public static final String COLUMN_POPULARITY = "popularity";
-
         public static final String COLUMN_FAVORITE = "favorite";
 
         public static Uri buildMovieWithPoster(String posterUrl) {

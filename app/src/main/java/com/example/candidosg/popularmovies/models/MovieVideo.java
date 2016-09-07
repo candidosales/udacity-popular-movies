@@ -7,12 +7,12 @@ import org.parceler.Parcel;
  */
 @Parcel
 public class MovieVideo {
-    private String id;
-    private String key;
-    private String name;
-    private String site;
-    private String size;
-    private String type;
+    String id;
+    String key;
+    String name;
+    String site;
+    String size;
+    String type;
 
     public MovieVideo() {
 

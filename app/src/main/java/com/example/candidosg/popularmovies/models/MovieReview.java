@@ -7,10 +7,10 @@ import org.parceler.Parcel;
  */
 @Parcel
 public class MovieReview {
-    private String id;
-    private String author;
-    private String content;
-    private String url;
+    String id;
+    String author;
+    String content;
+    String url;
 
 
     public MovieReview() {

@@ -76,6 +76,10 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
         setHasOptionsMenu(true);
     }
 
+    public interface Callback{
+        void onItemSelected(Uri movieUri);
+    }
+
 
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.moviefragment, menu);
@@ -125,8 +129,11 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
                     final int MOVIE_ID_COL = currentData.getColumnIndex(MovieContract.MovieEntry._ID);
                     Uri movieUri = MovieContract.MovieEntry.buildMovieWithId(currentData.getInt(MOVIE_ID_COL));
 
-                    intent.setData(movieUri);
-                    startActivity(intent);
+                    ((Callback) getActivity())
+                            .onItemSelected(movieUri);
+
+//                    intent.setData(movieUri);
+//                    startActivity(intent);
                 }
 
             }
@@ -134,6 +141,7 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
 
         return rootView;
     }
+
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {

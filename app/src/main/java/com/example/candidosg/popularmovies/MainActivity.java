@@ -1,40 +1,47 @@
 package com.example.candidosg.popularmovies;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import com.example.candidosg.popularmovies.data.MovieContract;
+import com.example.candidosg.popularmovies.fragments.DetailFragment;
 import com.example.candidosg.popularmovies.fragments.MovieFragment;
 import com.example.candidosg.popularmovies.tasks.FetchMoviesTask;
-import com.facebook.stetho.Stetho;
 
 import java.util.Date;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements MovieFragment.Callback {
+    private static final String LOG_TAG = MainActivity.class.getSimpleName();
+    private static final String DETAILFRAGMENT_TAG = "DFTAG";
+
+    private boolean mTwoPane;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        if (savedInstanceState == null) {
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.container, new MovieFragment())
-                    .commit();
-        }
 
-        updateTiles();
-        Stetho.initialize(
-                Stetho.newInitializerBuilder(this)
-                        .enableDumpapp(
-                                Stetho.defaultDumperPluginsProvider(this))
-                        .enableWebKitInspector(
-                                Stetho.defaultInspectorModulesProvider(this))
-                        .build());
+        updateMovies();
+
+        if(findViewById(R.id.movie_detail_container) != null){
+            Log.i(LOG_TAG, "Two Pane Layout");
+            mTwoPane = true;
+            if(savedInstanceState == null){
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.movie_detail_container, new DetailFragment(), DETAILFRAGMENT_TAG)
+                        .commit();
+            }
+        }else{
+            mTwoPane = false;
+        }
 
     }
 
@@ -53,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private  void updateTiles(){
+    private  void updateMovies(){
         final SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         final long bestBefore = settings.getLong(Config.VALID_TILL, 0L);
         AsyncTask.execute(new Runnable() {
@@ -74,6 +81,28 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    @Override
+    public void onItemSelected(Uri movieUri) {
+        DetailFragment detailFragment = (DetailFragment) getSupportFragmentManager().findFragmentByTag(DETAILFRAGMENT_TAG);
+        if(detailFragment != null){
+
+            Bundle args = new Bundle();
+            args.putParcelable(DetailFragment.DETAIL_URI, movieUri);
+
+            DetailFragment fragment = new DetailFragment();
+            fragment.setArguments(args);
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.movie_detail_container, fragment, DETAILFRAGMENT_TAG)
+                    .commit();
+
+        }else{
+
+            Intent detailIntent = new Intent(getApplicationContext(), DetailActivity.class);
+            detailIntent.setData(movieUri);
+            startActivity(detailIntent);
+        }
     }
 
 }
