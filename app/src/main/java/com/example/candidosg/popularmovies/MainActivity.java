@@ -34,11 +34,6 @@ public class MainActivity extends AppCompatActivity implements MovieFragment.Cal
         if(findViewById(R.id.movie_detail_container) != null){
             Log.i(LOG_TAG, "Two Pane Layout");
             mTwoPane = true;
-            if(savedInstanceState == null){
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.movie_detail_container, new DetailFragment(), DETAILFRAGMENT_TAG)
-                        .commit();
-            }
         }else{
             mTwoPane = false;
         }
@@ -85,9 +80,7 @@ public class MainActivity extends AppCompatActivity implements MovieFragment.Cal
 
     @Override
     public void onItemSelected(Uri movieUri) {
-        DetailFragment detailFragment = (DetailFragment) getSupportFragmentManager().findFragmentByTag(DETAILFRAGMENT_TAG);
-        if(detailFragment != null){
-
+        if(mTwoPane){
             Bundle args = new Bundle();
             args.putParcelable(DetailFragment.DETAIL_URI, movieUri);
 
@@ -96,8 +89,7 @@ public class MainActivity extends AppCompatActivity implements MovieFragment.Cal
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.movie_detail_container, fragment, DETAILFRAGMENT_TAG)
                     .commit();
-
-        }else{
+        } else {
 
             Intent detailIntent = new Intent(getApplicationContext(), DetailActivity.class);
             detailIntent.setData(movieUri);

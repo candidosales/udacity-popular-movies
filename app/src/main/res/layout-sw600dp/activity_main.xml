@@ -12,7 +12,7 @@
     -->
 
     <fragment
-        android:id="@+id/content_main"
+        android:id="@+id/container"
         android:name="com.example.candidosg.popularmovies.fragments.MovieFragment"
         android:layout_width="0dp"
         android:layout_height="match_parent"
